@@ -1,4 +1,4 @@
-class linesperseason {
+class Linesperseason {
     /**
     * Class constructor with basic chart configuration
     * @param {Object}
