@@ -53,11 +53,11 @@ class LineCount {
         vis.svg.append("text")
         .attr("transform", `translate(${vis.width/2},${vis.config.margin.top})`) // Center the text horizontally
         .attr("text-anchor", "middle") // Center the text horizontally
-        .attr("x", 80)
+        .attr("x", 70)
         .attr("y", -10)
         .attr("font-size", "14px")
         .attr("font-weight", "bold") // Make the text bold
-        .text("Number of Calls for each Agency Responsible")
+        .text("Number of Lines for Each Main Character in Seinfeld")
 
 
 
@@ -100,25 +100,29 @@ class LineCount {
             .attr("x", vis.width - 550)
             .attr("font-size", "16px")
             .attr("stroke", "black")
-            .text("Agency Responsible");
+            .text("Main Characters in Seinfeld");
 
         vis.yAxisG.append('text')
             .attr("transform", "rotate(-90)")
             .attr("dy", "-13.5em")
-            .attr("y", vis.height - 410)
-            .attr("x", vis.width - 1290)
-            .attr("font-size", "12px")
+            .attr("y", vis.height - 335)
+            .attr("x", vis.width - 1270)
+            .attr("font-size", "16px")
             .attr("stroke", "black")
-            .text("Number of Calls");
+            .text("Number of Lines");
 
-        const orderedKeys = ['Cinc Building Dept', 'Cinc Health Dept', 'Dept of Trans and Eng', 'Police Department', 'Public Services', 'Park Department', 'Cin Water Works', 'Fire Dept', 'Metropolitan Sewer', 'Other'];
+        
+        let character = d3.rollups(vis.data, v => v.length, d => d.Character);
+        character.sort(function(a,b) {
+            return b[1] - a[1]
+        })
+        console.log(character);
+        character.splice(8, 1633);
 
-        let agency_responsible = d3.rollups(vis.data, v => v.length, d => d.agency_responsible);
-        let swap = agency_responsible[10];
-        agency_responsible[10] = agency_responsible[6];
-        agency_responsible[6] = swap;
-        console.log(agency_responsible);
-        let aggregatedData = Array.from(agency_responsible, ([key, count]) => ({ key, count }));
+        const orderedKeys = ['JERRY', 'GEORGE', 'ELAINE', 'KRAMER', 'NEWMAN', 'MORTY', 'HELEN', 'FRANK'];
+
+        
+        let aggregatedData = Array.from(character, ([key, count]) => ({ key, count }));
 
         // Filter the aggregatedData array to only include keys in the orderedKeys array
         vis.aggregatedData = aggregatedData.filter(d => orderedKeys.includes(d.key));
@@ -144,7 +148,7 @@ class LineCount {
 
         // Add rectangles
         const bars = vis.chart.selectAll('.bar')
-            .data(vis.aggregatedData, d => d.agency_responsible)
+            .data(vis.aggregatedData, d => d.Character)
             .join('rect')
             .attr('class', 'bar')
             .attr('width', vis.xScale.bandwidth())
@@ -161,21 +165,21 @@ class LineCount {
                     .style('top', (event.pageY + vis.config.tooltipPadding) + 'px')
                     .style('opacity', 1)
                     // Format number with million and thousand separator
-                    .html(`<div class="tooltip-title2">Agency Responsible</div><ul>${d3.format(',')(d.count)} </ul>`);
+                    .html(`<div class="tooltip-title2">Number of Lines</div><ul>${d3.format(',')(d.count)} </ul>`);
             })
             .on('mouseleave', () => {
                 d3.select('#tooltip1').style('display', 'none');
-            })
-            .on('click', function (event, d) {
-                const isActive = agencyFilter.includes(d.key);
-                if (isActive) {
-                    agencyFilter = agencyFilter.filter(f => f !== d.key); // Remove filter
-                } else {
-                    agencyFilter.push(d.key); // Append filter
-                }
-                AgencyFilter(); // Call global function to update scatter plot
-                d3.select(this).classed('active', !isActive); // Add class to style active filters with CSS
             });
+            // .on('click', function (event, d) {
+            //     const isActive = agencyFilter.includes(d.key);
+            //     if (isActive) {
+            //         agencyFilter = agencyFilter.filter(f => f !== d.key); // Remove filter
+            //     } else {
+            //         agencyFilter.push(d.key); // Append filter
+            //     }
+            //     AgencyFilter(); // Call global function to update scatter plot
+            //     d3.select(this).classed('active', !isActive); // Add class to style active filters with CSS
+            // });
 
         // Update the axes because the underlying scales might have changed
         vis.xAxisG.call(vis.xAxis);
