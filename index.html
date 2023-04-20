@@ -1,16 +1,31 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>D3 Project Starter Template</title>
+    <title>Seinfeld Data Analysis</title>
     <meta charset="UTF-8">
     <link rel="icon" href="data:;base64,iVBORwOKGO=" />
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>    
     <!-- Add HTML content, SVG drawing area, ... -->
-    <svg id="wordcloud"></svg>
+    <div class="container">
+        <nav>
+         <input id="toggle" type="checkbox" checked>
+        <h2>Select a Character</h2>
+      <ul>
+        <li><a href="#chapter1">Chapter 01</a></li>
+        <li><a href="#chapter2">Chapter 02</a></li>
+        <li><a href="#chapter3">Chapter 03</a></li>
+        <li><a href="#chapter4">Chapter 04</a></li>
+      </ul>
+    </nav>
+    </div>
     <svg id="linecount"></svg>
-    <h1>test</h1>
+    <div id="tooltip1"></div>
+    <svg id="episodeCount"></svg>
+    <div id="tooltip2"></div>
+    <svg id="linesperseason"></svg>
+    <svg id="wordcloud"></svg>
     <!-- D3 bundle -->
     <script src="js/d3.v6.min.js"></script>
 
@@ -18,5 +33,10 @@
     <script src="js/main.js"></script>
     <script src="js/wordcloud.js"></script>
     <script src="js/totalLineCount.js"></script>
+    <script src="js/episodesAppearedIn.js"></script>
+    <script src="js/linesperseason.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-cloud/1.2.5/d3.layout.cloud.min.js"></script>
+
+    <div id="tooltip"></div>
 </body>
 </html>
