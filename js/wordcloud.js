@@ -32,15 +32,12 @@ class Wordcloud {
             .append('g')
             .attr('transform', `translate(${vis.config.margin.left},${vis.config.margin.top})`);
 
-        // Count words and remove stopwords
-        const stopWords = ['a', 'an', 'and', 'are', 'as', 'at', 'be', 'by', 'for', 'from', 'has', 'he', 'in', 'is', 'it', 'its', 'of', 'on', 'that', 'the', 'to', 'was', 'were', 'will', 'with'];
         const wordCount = d3.rollup(
-            vis.data.filter((d) => d.dialogue), // filter out empty dialogue
+            vis.data,
             (v) => v.length,
-            (d) => d.dialogue
+            (d) => d.Dialogue
         );
-        const words = Array.from(wordCount, ([key, value]) => ({ text: key, value }))
-            .filter((d) => !stopWords.includes(d.text.toLowerCase())); // remove stopwords
+        const words = Array.from(wordCount, ([key, value]) => ({ text: key, value }));
 
         vis.layout = d3.layout
             .cloud()
