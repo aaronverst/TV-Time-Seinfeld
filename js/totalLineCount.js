@@ -116,7 +116,6 @@ class LineCount {
         character.sort(function(a,b) {
             return b[1] - a[1]
         })
-        console.log(character);
         character.splice(8, 1633);
 
         const orderedKeys = ['JERRY', 'GEORGE', 'ELAINE', 'KRAMER', 'NEWMAN', 'MORTY', 'HELEN', 'FRANK'];

@@ -1,4 +1,4 @@
-class EpisodeCount {
+class sznNumEpisodes {
     /**
     * Class constructor with basic chart configuration
     * @param {Object}
@@ -109,7 +109,7 @@ class EpisodeCount {
             .attr("x", vis.width - 1270)
             .attr("font-size", "16px")
             .attr("stroke", "black")
-            .text("Number of Episodes");
+            .text("Number of Episodes (by Season)");
 
         
         let numEpisodes = d3.rollups(vis.data, v => v.length, d => d.Character, d => d.SEID);
