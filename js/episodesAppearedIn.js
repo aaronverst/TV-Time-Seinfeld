@@ -117,10 +117,10 @@ class EpisodeCount {
         for(let i = 0; i < numEpisodes.length; i++) {
             numEpisodes[i][1] = numEpisodes[i][1].length;
         };
-        numEpisodes.splice(2, 1, numEpisodes[6]);
-        numEpisodes.splice(3, 1, numEpisodes[11]);
-        numEpisodes.splice(4, 1, numEpisodes[79]);
-        numEpisodes.splice(5, 1, numEpisodes[17]);
+        // numEpisodes.splice(2, 1, numEpisodes[6]);
+        // numEpisodes.splice(3, 1, numEpisodes[11]);
+        // numEpisodes.splice(4, 1, numEpisodes[79]);
+        // numEpisodes.splice(5, 1, numEpisodes[17]);
         numEpisodes.unshift(["TOTAL EPISODES", 180]);
 
         const orderedKeys = ['TOTAL EPISODES', 'JERRY', 'GEORGE', 'ELAINE', 'KRAMER', 'NEWMAN', 'MORTY', 'HELEN', 'FRANK'];

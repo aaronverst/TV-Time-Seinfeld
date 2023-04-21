@@ -1,11 +1,12 @@
-var count = 0;
 let _data = [];
-d3.csv('../data/scripts.csv')
+d3.csv('../data/scripts_updated.csv')
     .then(data => {
         data.forEach(d => {
             _data = data;
             // count += 1;
         })
+
+        
 
         const actorContainer = document.getElementById("character_dropdown");
 
@@ -13,26 +14,34 @@ d3.csv('../data/scripts.csv')
             $(".character_dropdown-content").select2();
         });
 
-        let character = d3.rollups(_data, v => v.length, d => d.Character);
-        character.sort(function(a,b) {
-            return b[1] - a[1]
-        })
-        // character.splice(8, 1633);
+        let character = d3.rollups(data, v => v.length, d => d.Character, d => d.SEID);
+        
 
-        const orderedKeys = ['JERRY', 'GEORGE', 'ELAINE', 'KRAMER', 'NEWMAN', 'MORTY', 'HELEN', 'FRANK'];
+        const aggregatedDataMap = d3.rollups(data, v => v.length, d => d.Character, d => d.SEID);
+        dataMap = aggregatedDataMap;
+
+        jerryData = dataMap[0];
+        georgeData = dataMap[1];
+        elaineData = dataMap[2];
+        kramerData = dataMap[3];
+        newmanData = dataMap[4];
+        mortyData = dataMap[5];
+        helenData = dataMap[6];
+        frankData = dataMap[7];
+        
+
+        console.log(aggregatedDataMap);
 
         
-        let aggregatedData = Array.from(character, ([key, count]) => ({ key, count }));
 
         // Filter the aggregatedData array to only include keys in the orderedKeys array
-        aggregatedData = aggregatedData.filter(d => orderedKeys.includes(d.key));
         
 
-        for( let i = 0; i < aggregatedData.length; i++) {
+       for( let i = 0; i < aggregatedDataMap.length; i++) {
             var actorElement = document.createElement('option');
-            actorElement.value = aggregatedData[i].key;
-            actorElement.innerHTML = aggregatedData[i].key;
-
+            actorElement.value = aggregatedDataMap[i][0];
+            actorElement.innerHTML = aggregatedDataMap[i][0];
+        
             actorContainer.appendChild(actorElement);
         }
 
@@ -46,4 +55,27 @@ function actorDropdown() {
 
 actorDropdown();
 
-// $("select.character_dropdown-content").change(updateVenue);
+$("select.character_dropdown-content").change(updateActor);
+
+function updateActor() {
+    var numEpisodes = $('select.character_dropdown-content').val();
+
+    $('.c-container')
+        .find('.character-container')
+        .hide()
+        .filter(function () {
+            var okEpisode = false;  
+
+            if (numEpisodes !== "None") {
+                okEpisode = $(this).attr('data-character') === numEpisodes;
+                console.log($(this).attr('data-character'));
+                console.log(okEpisode);
+                console.log(numEpisodes);
+                if (okEpisode == true) {
+                    return okEpisode; 
+                    }
+            }
+
+        }).fadeIn('fast');
+
+}

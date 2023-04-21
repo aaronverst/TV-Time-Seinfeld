@@ -3,7 +3,7 @@ let Dialogue = [];
 let SEID = [];
 let lineCount, linesperseason, episodeCount;
 
-d3.csv('data/scripts.csv')
+d3.csv('data/scripts_updated.csv')
     .then(data => {
         data.forEach(d => {
             _data = data;
@@ -13,6 +13,7 @@ d3.csv('data/scripts.csv')
         lineCount = new LineCount({ parentElement: '#linecount' }, data);
         episodeCount = new EpisodeCount({parentElement: '#episodeCount'}, data);
         sznNumEpisodes = new sznNumEpisodes({parentElement: '#sznnumepisodes'}, data);
+        // linesPerEpisode = new LinesPerEpisode({ parentElement: '#linesPerEpisode' }, data);
         // wordcloud = new Wordcloud({ parentElement: '#wordcloud' }, data);
         // linesperseason = new Linesperseason({parentElement: '#linesperseason'}, data);
         
@@ -20,4 +21,5 @@ d3.csv('data/scripts.csv')
         lineCount.updateVis();
         episodeCount.updateVis();
         sznNumEpisodes.updateVis();
+        // linesPerEpisode.updateVis();
     });

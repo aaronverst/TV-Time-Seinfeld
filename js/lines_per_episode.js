@@ -148,19 +148,28 @@ class LinesPerEpisode {
             .text("Number of Service Calls")
 
 
-        const aggregatedDataMap = d3.rollups(vis.data, v => v.length, d => d.week_number);
+        const aggregatedDataMap = d3.rollups(vis.data, v => v.length, d => d.Character, d => d.SEID);
 
         vis.aggregatedData = aggregatedDataMap;
-        vis.aggregatedData.sort();
+        console.log(vis.aggregatedData);
+        // vis.aggregatedData.sort();
 
-        // const orderedKeys = ['23', '24', '25', '26', '27', '28', '29', '30', '31', '32', '33', '34', '35', '36'];
-        // vis.aggregatedData = vis.aggregatedData.sort((a, b) => {
-        //     return orderedKeys.indexOf(a.key) - orderedKeys.indexOf(b.key);
-        // });
+        const orderedKeys = ['JERRY', 'GEORGE', 'ELAINE', 'KRAMER', 'NEWMAN', 'MORTY', 'HELEN', 'FRANK'];
+
+        let characterData = Array.from(aggregatedDataMap, ([key, count]) => ({ key, count }));
+        vis.aggregatedData = characterData.sort((a, b) => {
+            return orderedKeys.indexOf(a.key) - orderedKeys.indexOf(b.key);
+        });
 
 
-        vis.xValue = d => d[0];
-        vis.yValue = d => d[1];
+        vis.updatedData = 
+        console.log(vis.aggregatedData);
+
+        vis.xValue = d => d.key;
+        vis.yValue = d => d.count.map(x => ({
+            episodeNum: x[0],
+            numLines: x[1]
+        }));
 
         vis.line = d3.line()
             .x(d => vis.xScaleFocus(vis.xValue(d)))
@@ -185,10 +194,10 @@ class LinesPerEpisode {
     renderVis() {
 
         let vis = this;
-        const aggregatedDataMap = d3.rollups(vis.data, v => v.length, d => d.week_number);
+        // const aggregatedDataMap = d3.rollups(vis.data, v => v.length, d => d.week_number);
 
-        vis.xValue = d => d[0];
-        vis.yValue = d => d[1];
+        // vis.xValue = d => d[0];
+        // vis.yValue = d => d[1];
 
         vis.focusLinePath
             .datum(vis.aggregatedData)
