@@ -16,9 +16,11 @@ d3.csv('data/scripts_updated.csv')
       chartData[i] = data[i];
     };
 
+    chartData.shift();
+
     // cardData.shift();
-    const aggregatedDataMap = d3.rollups(chartData, v => v.length, d => d.Character, d => d.SEID);
-    dataMap = aggregatedDataMap;
+    let aggregatedData = d3.rollups(chartData, v => v.length, d => d.Character, d => d.SEID);
+    dataMap = aggregatedData;
 
     jerryData = dataMap[0];
     georgeData = dataMap[1];
@@ -28,42 +30,82 @@ d3.csv('data/scripts_updated.csv')
     mortyData = dataMap[5];
     helenData = dataMap[6];
     frankData = dataMap[7];
-        
 
-        console.log(aggregatedDataMap);
+    console.log(jerryData);
+    console.log(georgeData);
 
-        // for( let i = 0; i < aggregatedDataMap.length; i++) {
-        //     var actorElement = document.createElement('option');
-        //     actorElement.value = aggregatedDataMap[i][0];
-        //     actorElement.innerHTML = aggregatedDataMap[i][0];
-        
-        //     actorContainer.appendChild(actorElement);
-        // }
 
-        // linesPerEpisode = new LinesPerEpisode({ parentElement: '#linesPerEpisode' }, jerryData);
 
-            linesPerEpisode = new LinesPerEpisode({ parentElement: '#linesPerEpisode' }, jerryData);
-            const postcontainer = document.querySelector('.c-container');
 
-            const cardMethods = () => {
-                const postElement = document.createElement('div');
-                postElement.classList.add('character-container');
-                postElement.setAttribute('data-character',  aggregatedDataMap[0]);
-                postElement.innerHTML = `
-                    <svg id="linesPerEpisode">
-                        <script src="js/lines_per_episode.js">
-                        </script>
-                    </svg>
+    const orderedKeys = ['JERRY', 'GEORGE', 'ELAINE', 'KRAMER', 'NEWMAN', 'MORTY', 'HELEN', 'FRANK'];
+
+
+    let aggregatedDataMap = Array.from(aggregatedData, ([key, count]) => ({ key, count }));
+    aggregatedDataMap = aggregatedDataMap.filter(d => orderedKeys.includes(d.key));
+    console.log(aggregatedDataMap);
+
+    // for( let i = 0; i < aggregatedDataMap.length; i++) {
+    //     var actorElement = document.createElement('option');
+    //     actorElement.value = aggregatedDataMap[i][0];
+    //     actorElement.innerHTML = aggregatedDataMap[i][0];
+
+    //     actorContainer.appendChild(actorElement);
+    // }
+
+
+
+
+    const postcontainer = document.querySelector('.c-container');
+
+    const cardMethods = () => {
+      aggregatedDataMap.map((postData) => {
+        const postElement = document.createElement('div');
+        postElement.classList.add('character-container');
+        postElement.setAttribute('data-character', postData.key);
+        if (postData.key == "JERRY") {
+          postElement.innerHTML = `
+        <svg id="linesPerEpisodeJerry">
+        </svg>
                 `
-            postcontainer.appendChild(postElement);
-            }
+        }
+        else if (postData.key == "GEORGE") {
+          postElement.innerHTML = `
+          <svg id="linesPerEpisodeGeorge">
+          </svg>
+                  `
+        }
+        else if (postData.key == "KRAMER") {
+          postElement.innerHTML = `
+          <svg id="linesPerEpisodeKramer">
+          </svg>
+                  `
+        }
+        else if (postData.key == "ELAINE") {
+          postElement.innerHTML = `
+          <svg id="linesPerEpisodeElaine">
+          </svg>
+                  `
+        }
+        else if (postData.key == "MORTY") {
+          postElement.innerHTML = `
+          <svg id="linesPerEpisodeMorty">
+          </svg>
+                  `
+        }
+        else if (postData.key == "NEWMAN") {
+          postElement.innerHTML = `
+          <svg id="linesPerEpisodeNewman">
+          </svg>
+                  `
+        }
+        postcontainer.appendChild(postElement);
+      })
+    }
     cardMethods();
-    linesPerEpisode.updateVis();
 
- 
   })
-   .catch(error => console.error(error));
- 
+  .catch(error => console.error(error));
+
 
 
 

@@ -22,20 +22,35 @@ class LinesPerEpisode {
     initVis() {
 
         let vis = this;
-        //vis.data.sort();
 
-        // These are just placeholders 
+        vis.aggregatedData = vis.data[1];
+
+        console.log(vis.aggregatedData);
+
+
+        vis.aggregatedData = Array.from(vis.aggregatedData, ([key, count]) => ({ key, count }));
+
+
+
+        // for (let i = 0; i < vis.aggregatedData.length; i++) {
+        //     vis.aggregatedData[i].key = vis.aggregatedData[i].key.replaceAll('S', '')
+        //     vis.aggregatedData[i].key = vis.aggregatedData[i].key.replaceAll('E', '')
+        //     vis.aggregatedData[i].key = +vis.aggregatedData[i].key;
+        // }
+        console.log(vis.aggregatedData);
+
+        vis.xValue = d => d.key;
+        vis.yValue = d => d.count;
 
         const containerWidth = vis.config.width + vis.config.margin.left + vis.config.margin.right;
         const containerHeight = vis.config.height + vis.config.margin.top + vis.config.margin.bottom;
 
         // Define the x-axis scale
-        vis.xScaleFocus = d3.scaleTime()
-            .range([0, vis.config.width])
+        vis.xScaleFocus = d3.scalePoint()
+            .range([0, vis.config.width], 0.5);
 
-
-        vis.xScaleContext = d3.scaleTime()
-            .range([0, vis.config.width]);
+        vis.xScaleContext = d3.scalePoint()
+            .range([0, vis.config.width], 0.5);
 
         vis.yScaleFocus = d3.scaleLinear()
             .range([vis.config.height, 0])
@@ -45,13 +60,13 @@ class LinesPerEpisode {
             .range([vis.config.contextHeight, 0])
             .nice();
 
-        vis.xAxisFocus = d3.axisBottom(vis.xScaleFocus).tickSizeOuter(0).tickFormat(d3.format("d"));
-        vis.xAxisContext = d3.axisBottom(vis.xScaleContext).tickSizeOuter(0).tickFormat(d3.format("d"));
+        vis.xAxisFocus = d3.axisBottom(vis.xScaleFocus);
+        vis.xAxisContext = d3.axisBottom(vis.xScaleContext);
         vis.yAxisFocus = d3.axisLeft(vis.yScaleFocus);
 
         vis.svg = d3.select(vis.config.parentElement)
             .attr("width", containerWidth)
-            .attr("height", containerHeight);
+            .attr("height", containerHeight)
 
         vis.svg.append("text")
             .attr("transform", "translate(0,0)")
@@ -67,9 +82,9 @@ class LinesPerEpisode {
         // Append empty x-axis group and move it to the bottom of the chart
         vis.focus.append('defs').append('clipPath')
             .attr('id', 'clip')
-            .append('rect')
             .attr('width', vis.config.width)
-            .attr('height', vis.config.height);
+            .attr('height', vis.config.height)
+            .append('rect');
 
         vis.focusLinePath = vis.focus.append('path')
             .attr('class', 'chart-line')
@@ -82,21 +97,21 @@ class LinesPerEpisode {
         vis.yAxisFocusG = vis.focus.append('g')
             .attr('class', 'axis y-axis');
 
-        vis.tooltipTrackingArea = vis.focus.append('rect')
-            .attr('width', vis.config.width)
-            .attr('height', vis.config.height)
-            .attr('fill', 'none')
-            .attr('pointer-events', 'all');
+        // vis.tooltipTrackingArea = vis.focus.append('rect')
+        //     .attr('width', vis.config.width)
+        //     .attr('height', vis.config.height)
+        //     .attr('fill', 'none')
+        //     .attr('pointer-events', 'all');
 
-        // Empty tooltip group (hidden by default)
-        vis.tooltip = vis.focus.append('g')
-            .attr('class', 'tooltdip2')
-            .style('display', 'none');
+        // // Empty tooltip group (hidden by default)
+        // vis.tooltip = vis.focus.append('g')
+        //     .attr('class', 'tooltip2')
+        //     .style('display', 'none');
 
-        vis.tooltip.append('circle')
-            .attr('r', 4);
+        // vis.tooltip.append('circle')
+        //     .attr('r', 4);
 
-        vis.tooltip.append('text');
+        // vis.tooltip.append('text');
 
         // 
         // Append context group with x- and y-axes
@@ -148,28 +163,21 @@ class LinesPerEpisode {
             .text("Number of Service Calls")
 
 
-        const aggregatedDataMap = d3.rollups(vis.data, v => v.length, d => d.Character, d => d.SEID);
-
-        vis.aggregatedData = aggregatedDataMap;
-        console.log(vis.aggregatedData);
-        // vis.aggregatedData.sort();
-
-        const orderedKeys = ['JERRY', 'GEORGE', 'ELAINE', 'KRAMER', 'NEWMAN', 'MORTY', 'HELEN', 'FRANK'];
-
-        let characterData = Array.from(aggregatedDataMap, ([key, count]) => ({ key, count }));
-        vis.aggregatedData = characterData.sort((a, b) => {
-            return orderedKeys.indexOf(a.key) - orderedKeys.indexOf(b.key);
-        });
-
-
-        vis.updatedData = 
-        console.log(vis.aggregatedData);
-
         vis.xValue = d => d.key;
-        vis.yValue = d => d.count.map(x => ({
-            episodeNum: x[0],
-            numLines: x[1]
+        vis.yValue = d => d.count;
+
+        vis.Start = vis.aggregatedData[0].key;
+        vis.End = vis.aggregatedData[vis.aggregatedData.length - 1].key;
+
+
+        // Set the scale input domains
+        vis.xScaleFocus.domain(vis.aggregatedData.map(function (d) {
+            return d.key;
         }));
+        vis.yScaleFocus.domain([0, d3.max(vis.aggregatedData, vis.yValue) + 50]);
+        vis.xScaleContext.domain(vis.xScaleFocus.domain());
+        vis.yScaleContext.domain(vis.yScaleFocus.domain());
+        // vis.bisectDate = d3.bisector(vis.xValue).left;
 
         vis.line = d3.line()
             .x(d => vis.xScaleFocus(vis.xValue(d)))
@@ -179,13 +187,6 @@ class LinesPerEpisode {
             .x(d => vis.xScaleContext(vis.xValue(d)))
             .y1(d => vis.yScaleContext(vis.yValue(d)))
             .y0(vis.config.contextHeight);
-
-        // Set the scale input domains
-        vis.xScaleFocus.domain(d3.extent(vis.aggregatedData, vis.xValue));
-        vis.yScaleFocus.domain(d3.extent(vis.aggregatedData, vis.yValue));
-        vis.xScaleContext.domain(vis.xScaleFocus.domain());
-        vis.yScaleContext.domain(vis.yScaleFocus.domain());
-        vis.bisectDate = d3.bisector(vis.xValue).left;
 
         vis.renderVis();
 
@@ -208,61 +209,35 @@ class LinesPerEpisode {
             .attr('d', vis.area);
 
 
-        vis.tooltipTrackingArea
-            .on('mouseenter', () => {
-                vis.tooltip.style('display', 'block');
-            })
-            .on('mouseleave', () => {
-                vis.tooltip.style('display', 'none');
-            })
-            .on('mousemove', function (event) {
-                // Get date that corresponds to current mouse x-coordinate
-                const xPos = d3.pointer(event, this)[0]; // First array element is x, second is y
-                const date = vis.xScaleFocus.invert(xPos);
-
-                // Find nearest data point
-                const index = vis.bisectDate(vis.aggregatedData, date, 1);
-                const a = vis.aggregatedData[index - 1];
-                const b = vis.aggregatedData[index];
-                const d = b && (date - a[0] > b[0] - date) ? b : a;
-
-                // Update tooltip
-                vis.tooltip.select('circle')
-                    .attr('transform', `translate(${vis.xScaleFocus(d[0])},${vis.yScaleFocus(d[1])})`);
-
-                vis.tooltip.select('text')
-                    .attr('transform', `translate(${vis.xScaleFocus(d[0])},${(vis.yScaleFocus(d[1]) - 15)})`)
-                    .text(Math.round(d[1]));
-            })
-
-
-
-        // vis.brushG
-        //     .call(vis.brush)
-        //     //.data(vis.aggregatedData)
-        //     .on('click', function (selection, range) {
+        // vis.tooltipTrackingArea
+        //     .on('mouseenter', () => {
+        //         vis.tooltip.style('display', 'block');
+        //     })
+        //     .on('mouseleave', () => {
+        //         vis.tooltip.style('display', 'none');
+        //     })
+        //     .on('mousemove', function (event) {
+        //         // Get date that corresponds to current mouse x-coordinate
         //         const xPos = d3.pointer(event, this)[0]; // First array element is x, second is y
-        //         const date = vis.xScaleFocus.invert(xPos);
+        //         const date = vis.xScaleFocus(xPos);
+
+        //         // Find nearest data point
         //         const index = vis.bisectDate(vis.aggregatedData, date, 1);
         //         const a = vis.aggregatedData[index - 1];
-        //         console.log(a)
         //         const b = vis.aggregatedData[index];
         //         const d = b && (date - a[0] > b[0] - date) ? b : a;
-        //         console.log(index)
-        //         range = vis.xScaleContext.range()[1];
-        //         let start = b[0];
-        //         let end = index + 23;
-        //         if (selection) {
-        //             const isActive = callFilter.includes(start, end);
-        //             if (isActive) {
-        //                 callFilter = callFilter.filter(f => f !== (start, end)); // Remove filter
-        //             } else {
-        //                 callFilter.push(start, end); // Append filter
-        //             }
-        //             brushFilter(); // Call global function to update scatter plot
-        //             d3.select(this).classed('active', !isActive); // Add class to style active filters with CSS
-        //         }
-        //     });
+
+        //         // Update tooltip
+        //         vis.tooltip.select('circle')
+        //             .attr('transform', `translate(${vis.xScaleFocus(d[0])},${vis.yScaleFocus(d[1])})`);
+
+        //         vis.tooltip.select('text')
+        //             .attr('transform', `translate(${vis.xScaleFocus(d[0])},${(vis.yScaleFocus(d[1]) - 15)})`)
+        //             .text(Math.round(d[1]));
+        //     })
+
+
+
 
 
         // Update the axes
@@ -270,7 +245,7 @@ class LinesPerEpisode {
         vis.yAxisFocusG.call(vis.yAxisFocus);
         vis.xAxisContextG.call(vis.xAxisContext);
 
-        const defaultBrushSelection = [vis.xScaleFocus(new Date(23)), vis.xScaleContext.range()[1]];
+        const defaultBrushSelection = [0, vis.xScaleContext.range()[1]];
         vis.brushG
             .call(vis.brush)
             .call(vis.brush.move, defaultBrushSelection);
@@ -283,7 +258,8 @@ class LinesPerEpisode {
 
         // Check if the brush is still active or if it has been removed
         if (selection) {
-            const selectedDomain = selection.map(vis.xScaleContext.invert, vis.xScaleContext);
+            console.log(vis.xScaleContext);
+            const selectedDomain = selection.map(vis.xScaleContent.invert, vis.xScaleContext);
             // console.log(vis.xScaleContext.invert);
             // console.log(vis.xScaleContext.range()[0]);
             // Convert given pixel coordinates (range: [x0,x1]) into a time period (domain: [Date, Date])
@@ -299,14 +275,3 @@ class LinesPerEpisode {
         vis.xAxisFocusG.call(vis.xAxisFocus);
     }
 };
-
-// function arrayToObject(dataMap, data) {
-
-//     dataMap = Array.from(data, ([key, count]) => ({ key, count }));
-
-//     const orderedKeys = ['23', '24', '25', '26', '27', '28', '29', '30', '31', '32', '33', '34', '35', '36'];
-//     dataMap = dataMap.sort((a, b) => {
-//         return orderedKeys.indexOf(a.key) - orderedKeys.indexOf(b.key);
-//     });
-//     return dataMap;
-// }
