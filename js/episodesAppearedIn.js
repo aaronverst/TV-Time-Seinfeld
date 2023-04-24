@@ -10,8 +10,8 @@ class EpisodeCount {
         // you might want to use getter and setter methods for individual attributes
         this.config = {
             parentElement: _config.parentElement,
-            containerWidth: _config.containerWidth || 1200,
-            containerHeight: _config.containerHeight || 600,
+            containerWidth: _config.containerWidth || 600,
+            containerHeight: _config.containerHeight || 400,
             margin: _config.margin || { top: 20, right: 40, bottom: 80, left: 75 },
             tooltipPadding: _config.tooltipPadding || 15
         }
@@ -51,13 +51,13 @@ class EpisodeCount {
             .attr('height', vis.config.containerHeight);
 
         vis.svg.append("text")
-        .attr("transform", `translate(${vis.width/2},${vis.config.margin.top})`) // Center the text horizontally
-        .attr("text-anchor", "middle") // Center the text horizontally
-        .attr("x", 77)
-        .attr("y", -10)
-        .attr("font-size", "14px")
-        .attr("font-weight", "bold") // Make the text bold
-        .text("Number of Episodes each Seinfeld Character Appeared In")
+            .attr("transform", `translate(${vis.width / 2},${vis.config.margin.top})`) // Center the text horizontally
+            .attr("text-anchor", "middle") // Center the text horizontally
+            .attr("x", 77)
+            .attr("y", -10)
+            .attr("font-size", "14px")
+            .attr("font-weight", "bold") // Make the text bold
+            .text("Number of Episodes each Seinfeld Character Appeared In")
 
 
 
@@ -96,36 +96,36 @@ class EpisodeCount {
 
         vis.xAxisG.append('text')
             .attr("transform", "translate(0,0)")
-            .attr("y", vis.height - 460)
-            .attr("x", vis.width - 550)
-            .attr("font-size", "16px")
+            .attr("y", vis.height - 260)
+            .attr("x", vis.width - 260)
+            .attr("font-size", "13px")
             .attr("stroke", "black")
             .text("Main Characters in Seinfeld");
 
         vis.yAxisG.append('text')
             .attr("transform", "rotate(-90)")
             .attr("dy", "-13.5em")
-            .attr("y", vis.height - 335)
-            .attr("x", vis.width - 1270)
-            .attr("font-size", "16px")
+            .attr("y", vis.height - 180)
+            .attr("x", vis.width - 600)
+            .attr("font-size", "13px")
             .attr("stroke", "black")
             .text("Number of Episodes");
 
-        
+
         let numEpisodes = d3.rollups(vis.data, v => v.length, d => d.Character, d => d.SEID);
-        
-        for(let i = 0; i < numEpisodes.length; i++) {
+
+        for (let i = 0; i < numEpisodes.length; i++) {
             numEpisodes[i][1] = numEpisodes[i][1].length;
         };
         // numEpisodes.splice(2, 1, numEpisodes[6]);
         // numEpisodes.splice(3, 1, numEpisodes[11]);
         // numEpisodes.splice(4, 1, numEpisodes[79]);
         // numEpisodes.splice(5, 1, numEpisodes[17]);
-        numEpisodes.unshift(["TOTAL EPISODES", 180]);
+        numEpisodes.unshift(["TOTAL EP", 180]);
 
-        const orderedKeys = ['TOTAL EPISODES', 'JERRY', 'GEORGE', 'ELAINE', 'KRAMER', 'NEWMAN', 'MORTY', 'HELEN', 'FRANK'];
+        const orderedKeys = ['TOTAL EP', 'JERRY', 'GEORGE', 'ELAINE', 'KRAMER', 'NEWMAN', 'MORTY', 'HELEN', 'FRANK'];
 
-        
+
         let aggregatedData = Array.from(numEpisodes, ([key, count]) => ({ key, count }));
 
         // Filter the aggregatedData array to only include keys in the orderedKeys array
@@ -161,7 +161,7 @@ class EpisodeCount {
             .attr('x', d => vis.xScale(vis.xValue(d)))
             .style('opacity', 0.5)
             .style('opacity', 1)
-            .style('fill', "#8AAC80") //change me 
+            .style('fill', "#eb3500") //change me 
             .on('mouseover', (event, d) => {
                 d3.select('#tooltip2')
                     .style('display', 'block')
@@ -174,16 +174,16 @@ class EpisodeCount {
             .on('mouseleave', () => {
                 d3.select('#tooltip2').style('display', 'none');
             });
-            // .on('click', function (event, d) {
-            //     const isActive = agencyFilter.includes(d.key);
-            //     if (isActive) {
-            //         agencyFilter = agencyFilter.filter(f => f !== d.key); // Remove filter
-            //     } else {
-            //         agencyFilter.push(d.key); // Append filter
-            //     }
-            //     AgencyFilter(); // Call global function to update scatter plot
-            //     d3.select(this).classed('active', !isActive); // Add class to style active filters with CSS
-            // });
+        // .on('click', function (event, d) {
+        //     const isActive = agencyFilter.includes(d.key);
+        //     if (isActive) {
+        //         agencyFilter = agencyFilter.filter(f => f !== d.key); // Remove filter
+        //     } else {
+        //         agencyFilter.push(d.key); // Append filter
+        //     }
+        //     AgencyFilter(); // Call global function to update scatter plot
+        //     d3.select(this).classed('active', !isActive); // Add class to style active filters with CSS
+        // });
 
         // Update the axes because the underlying scales might have changed
         vis.xAxisG.call(vis.xAxis);

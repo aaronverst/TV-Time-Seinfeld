@@ -1,4 +1,4 @@
-class LineCount {
+class SeasonNum {
     /**
     * Class constructor with basic chart configuration
     * @param {Object}
@@ -22,6 +22,8 @@ class LineCount {
     initVis() {
 
         let vis = this;
+
+
 
         vis.width = vis.config.containerWidth - vis.config.margin.left - vis.config.margin.right;
         vis.height = vis.config.containerHeight - vis.config.margin.top - vis.config.margin.bottom;
@@ -57,7 +59,7 @@ class LineCount {
             .attr("y", -10)
             .attr("font-size", "14px")
             .attr("font-weight", "bold") // Make the text bold
-            .text("Number of Lines for Each Main Character in Seinfeld")
+            .text("Number of Lines per Season for Each Main Character in Seinfeld")
 
 
 
@@ -112,16 +114,13 @@ class LineCount {
             .text("Number of Lines");
 
 
-        let character = d3.rollups(vis.data, v => v.length, d => d.Character);
-        character.sort(function (a, b) {
-            return b[1] - a[1]
-        })
-        character.splice(8, 1633);
 
-        const orderedKeys = ['JERRY', 'GEORGE', 'ELAINE', 'KRAMER', 'NEWMAN', 'MORTY', 'HELEN', 'FRANK'];
+        vis.aggregatedData = vis.data[1];
+
+        const orderedKeys = ['JERRY', 'GEORGE', 'ELAINE', 'KRAMER', 'NEWMAN', 'MORTY'];
 
 
-        let aggregatedData = Array.from(character, ([key, count]) => ({ key, count }));
+        let aggregatedData = Array.from(vis.aggregatedData, ([key, count]) => ({ key, count }));
 
         // Filter the aggregatedData array to only include keys in the orderedKeys array
         vis.aggregatedData = aggregatedData.filter(d => orderedKeys.includes(d.key));

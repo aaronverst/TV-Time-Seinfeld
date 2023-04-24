@@ -1,4 +1,4 @@
-class characterWordcloud {
+class CharacterWordcloud {
     /**
      * Class constructor with basic chart configuration
      * @param {Object}
@@ -22,6 +22,8 @@ class characterWordcloud {
     initVis() {
         let vis = this;
 
+        vis.aggregatedData = vis.data[1];
+        console.log(vis.aggregatedData);
         vis.width = vis.config.containerWidth - vis.config.margin.left - vis.config.margin.right;
         vis.height = vis.config.containerHeight - vis.config.margin.top - vis.config.margin.bottom;
 
@@ -32,20 +34,24 @@ class characterWordcloud {
             .append('g')
             .attr('transform', `translate(${vis.config.margin.left},${vis.config.margin.top})`);
 
-        const wordCount = d3.rollup(
-            vis.data,
-            (v) => v.length,
-            (d) => d.Dialogue
-        );
-        const words = Array.from(wordCount, ([key, value]) => ({ text: key, value }));
+        // const wordCount = d3.rollup(
+        //     vis.aggregatedData,
+        //     v => v.length,
+        //     d => d.Dialogue
+        // );
+
+        const words = Array.from(vis.aggregatedData, ([key, value]) => ({ text: key, value }));
+        const topWords = words.sort((a, b) => b.value - a.value).slice(0, 200);
+
+        console.log(words);
 
         vis.layout = d3.layout
             .cloud()
             .size([vis.width, vis.height])
-            .words(words)
-            .padding(5)
+            .words(topWords)
+            .padding(1)
             .rotate(() => (~~(Math.random() * 2) - 0.5) * 90)
-            .fontSize((d) => d.value / 15)
+            .fontSize((d) => d.value * 2)
             .on('end', (words) => vis.renderVis(words));
 
         vis.layout.start();
@@ -69,5 +75,7 @@ class characterWordcloud {
             .attr('text-anchor', 'middle')
             .attr('transform', (d) => `translate(${d.x},${d.y})rotate(${d.rotate})`)
             .text((d) => d.text);
+
+        console.log(words);
     }
 }

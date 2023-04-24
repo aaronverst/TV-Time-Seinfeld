@@ -10,12 +10,13 @@ class Wordcloud {
         // you might want to use getter and setter methods for individual attributes
         this.config = {
             parentElement: _config.parentElement,
-            containerWidth: _config.containerWidth || 1000,
-            containerHeight: _config.containerHeight || 600,
+            containerWidth: _config.containerWidth || 600,
+            containerHeight: _config.containerHeight || 400,
             margin: _config.margin || { top: 20, right: 40, bottom: 35, left: 55 },
             tooltipPadding: _config.tooltipPadding || 15,
         };
         this.data = _data;
+        //console.log(this.data)
         this.initVis();
     }
 
@@ -34,18 +35,20 @@ class Wordcloud {
 
         const wordCount = d3.rollup(
             vis.data,
-            (v) => v.length,
-            (d) => d.Dialogue
+            v => v.length,
+            d => d.Dialogue
         );
-        const words = Array.from(wordCount, ([key, value]) => ({ text: key, value }));
 
+        const words = Array.from(wordCount, ([key, value]) => ({ text: key, value }));
+        const topWords = words.sort((a, b) => b.value - a.value).slice(0, 200); // get the top 200 words
+        console.log(topWords);
         vis.layout = d3.layout
             .cloud()
             .size([vis.width, vis.height])
-            .words(words)
-            .padding(5)
+            .words(topWords)
+            .padding(1)
             .rotate(() => (~~(Math.random() * 2) - 0.5) * 90)
-            .fontSize((d) => d.value / 15)
+            .fontSize((d) => d.value / 4)
             .on('end', (words) => vis.renderVis(words));
 
         vis.layout.start();
@@ -65,9 +68,11 @@ class Wordcloud {
             .style('font-size', (d) => `${d.size}px`)
             .style('font-family', 'Arial, sans-serif')
             .style('font-weight', 'bold')
-            .style('fill', '#8AAC80')
+            .style('fill', '#eb3500')
             .attr('text-anchor', 'middle')
             .attr('transform', (d) => `translate(${d.x},${d.y})rotate(${d.rotate})`)
             .text((d) => d.text);
+
+        console.log(words)
     }
 }
